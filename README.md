@@ -101,4 +101,4 @@ A few were prepared further (the scripts are described in `docs/AI_WORKFLOW.md`)
 
 ## AI workflow
 
-See [`docs/AI_WORKFLOW.md`](docs/AI_WORKFLOW.md) for the tools used and the sequence of steps.
+See [`docs/AI_WORKFLOW.md`](docs/AI_WORKFLOW.md) for the tools used and the sequence of steps. The complete conversation, including all tool calls, is in [`AI_DOCUMENTATION/conversation-export.json`](AI_DOCUMENTATION/conversation-export.json).
