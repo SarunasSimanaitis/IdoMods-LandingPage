@@ -14,7 +14,13 @@ void main() {
 `
 
 const FRAGMENT_SHADER = `
+// highp where the GPU supports it: with mediump, the time value loses precision
+// after a few minutes on many phones and the animation starts to stutter.
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 
 uniform vec2 uResolution;
 uniform float uTime;

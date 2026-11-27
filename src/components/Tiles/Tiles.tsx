@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import thoroPhoto from '../../assets/tiles/thoro-woman.jpg'
-import laptop from '../../assets/tiles/configurator-laptop.png'
-import ipad from '../../assets/tiles/catalog-ipad.png'
-import phoneBack from '../../assets/tiles/smart-phone-back.png'
-import phoneFront from '../../assets/tiles/smart-phone-front.png'
+import laptop from '../../assets/tiles/configurator-laptop.webp'
+import ipad from '../../assets/tiles/catalog-ipad.webp'
+import phoneBack from '../../assets/tiles/smart-phone-back.webp'
+import phoneFront from '../../assets/tiles/smart-phone-front.webp'
 import './Tiles.css'
 
 type TileArt = {

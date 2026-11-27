@@ -14,7 +14,7 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
 | Figma MCP: `download_assets` | Batch export of composed nodes (lamps, mockups, badges) and their raw source images |
 | `curl` | Downloading every asset URL straight into `src/assets/` with descriptive names |
 | Python (Pillow, NumPy, SciPy, OpenCV) | Splitting the lamp layer, rebuilding the hero backdrop, locating exported mockups in the reference, pixel-diffing results |
-| Playwright + Chromium (headless) | Screenshots at 1920/1440/1180/1024/768/390 px, side-by-side comparison with Figma, automated interaction tests |
+| Playwright + Chromium (headless) | Screenshots from 1920 down to 320 px, side-by-side comparison with Figma, interaction checks, an audit script (overflow, console errors, failed requests, broken images). These scripts were run from a scratch folder and are not part of the repo. |
 | Vite, TypeScript (`tsc`), oxlint | Build, type-check, lint |
 
 ## Steps
@@ -41,7 +41,7 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
 10. **Automated checks.** A Playwright script checks the following, with no console errors:
     - header transparent → white on hover and after scroll;
     - dropdown opens;
-    - autoplay advances after 7 s and pauses on hover, keyboard focus and lamp use;
+    - the slider autoplay advances on its timer;
     - arrows and bar segments work;
     - a lamp switches on when clicked;
     - parallax follows the pointer;
@@ -55,7 +55,18 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
     - lamp clicks stop propagation and only toggle the light;
     - every manual change restarts the progress bar, including clicking the current segment.
 
-    A new Playwright script checks the timing (bar at about half after 3.5 s, slide change at 7 s), the hover pause, the 4 s resume delay, the lamp toggles, the bar resets and the touch behaviour. All 17 checks pass with no console errors.
+    A Playwright script checked the timing, the pauses, the lamp toggles and the bar resets.
+13. **Back to a simple timer (user feedback).** With the pauses, the slides changed too slowly. At the user's request I removed the hover, focus and interaction pauses and set a plain 8 s timer. I kept the 800 ms crossfade, the bar reset on manual changes, and lamp clicks that never change the slide.
+14. **Final technical audit**, run on the production build (`vite preview`):
+    - `tsc`, oxlint and `vite build` pass with no errors or warnings.
+    - Responsiveness was checked at 11 widths from 1920 to 320 px: no horizontal overflow, no failed requests, no broken images, no console errors, and every `<img>` has an `alt`.
+      - Fixed: at 320–359 px the burger button stuck out of the header by up to 8 px. Below 360 px the icon buttons are now 40 px.
+    - Image sizes: the eight transparent PNGs were 2.9 MB in total. I re-encoded them as WebP with Pillow, which brought them to 0.26 MB with no visible change (mean error about 1/255).
+    - Loading: tile and footer images are lazy-loaded. The hero images load first. The JS bundle is 110 kB gzipped, mostly React.
+    - WebGL: the shader draws one triangle at half resolution and runs only while the banner is on screen. It also stops in hidden tabs, because `requestAnimationFrame` stops there.
+      - Fixed: the shader used `mediump` floats. On many phones the time value loses precision after a few minutes and the animation stutters, so it now uses `highp` where the GPU supports it.
+    - The 19 interaction checks pass on the production build: header, dropdown, 8 s autoplay, arrows, bar, lamp toggle without slide change, parallax, tile hover, mobile menu, search and overflow.
+    - Screenshots at 1920 and 390 px were compared with the Figma render again. Every section matches except the shader banner, which is a live animation rather than a still frame.
 
 ## Notes
 

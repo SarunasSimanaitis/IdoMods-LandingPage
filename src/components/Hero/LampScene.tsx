@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import backdrop from '../../assets/hero/slide-1-backdrop.jpg'
-import rock from '../../assets/hero/rock.png'
-import lampBeige from '../../assets/hero/lamp-beige.png'
-import lampOlive from '../../assets/hero/lamp-olive.png'
-import lampTerracotta from '../../assets/hero/lamp-terracotta.png'
+import rock from '../../assets/hero/rock.webp'
+import lampBeige from '../../assets/hero/lamp-beige.webp'
+import lampOlive from '../../assets/hero/lamp-olive.webp'
+import lampTerracotta from '../../assets/hero/lamp-terracotta.webp'
 
 /**
  * Slide 1 of the hero, rebuilt from layers so the lamps can move (Figma comment 03).
@@ -52,11 +52,9 @@ const box = (x: number, y: number, width: number, height: number): CSSProperties
 type LampSceneProps = {
   /** Parallax only runs while the slide is visible. */
   isActive: boolean
-  /** Called on every lamp switch, so the slider can hold its autoplay. */
-  onInteract?: () => void
 }
 
-export function LampScene({ isActive, onInteract }: LampSceneProps) {
+export function LampScene({ isActive }: LampSceneProps) {
   const stageRef = useRef<HTMLDivElement>(null)
   const [litLamps, setLitLamps] = useState<Record<string, boolean>>({})
 
@@ -99,10 +97,7 @@ export function LampScene({ isActive, onInteract }: LampSceneProps) {
     }
   }, [isActive])
 
-  const toggleLamp = (id: string) => {
-    setLitLamps((lit) => ({ ...lit, [id]: !lit[id] }))
-    onInteract?.()
-  }
+  const toggleLamp = (id: string) => setLitLamps((lit) => ({ ...lit, [id]: !lit[id] }))
   const litCount = Object.values(litLamps).filter(Boolean).length
 
   return (
