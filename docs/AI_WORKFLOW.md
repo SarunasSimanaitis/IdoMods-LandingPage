@@ -16,6 +16,7 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
 | Python (Pillow, NumPy, SciPy, OpenCV) | Splitting the lamp layer, rebuilding the hero backdrop, locating exported mockups in the reference, pixel-diffing results |
 | Playwright + Chromium (headless) | Screenshots from 1920 down to 320 px, side-by-side comparison with Figma, interaction checks, an audit script (overflow, console errors, failed requests, broken images). These scripts were run from a scratch folder and are not part of the repo. |
 | Vite, TypeScript (`tsc`), oxlint | Build, type-check, lint |
+| Vercel CLI | Production deploy (the user approved the sign-in in their browser) |
 
 ## Steps
 
@@ -67,6 +68,8 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
       - Fixed: the shader used `mediump` floats. On many phones the time value loses precision after a few minutes and the animation stutters, so it now uses `highp` where the GPU supports it.
     - The 19 interaction checks pass on the production build: header, dropdown, 8 s autoplay, arrows, bar, lamp toggle without slide change, parallax, tile hover, mobile menu, search and overflow.
     - Screenshots at 1920 and 390 px were compared with the Figma render again. Every section matches except the shader banner, which is a live animation rather than a still frame.
+
+15. **Deploy.** I deployed the production build to Vercel with the Vercel CLI: https://idomods-landingpage.vercel.app. I ran the audit and the 19 interaction checks again against the live URL. All passed, with no console errors.
 
 ## Notes
 

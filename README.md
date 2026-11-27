@@ -3,6 +3,8 @@
 A landing page built from the Figma file *IdoMods rekrutacja frontend AI*.
 The stack is React, TypeScript, Vite and plain CSS with CSS variables, with no UI or animation libraries.
 
+**Live demo:** https://idomods-landingpage.vercel.app
+
 ![Figma reference](docs/reference/figma-landing-page-1920.png)
 
 ## Getting started
@@ -19,7 +21,7 @@ npm run lint      # oxlint
 
 There is no unit-test suite: the page has almost no logic to unit-test. The interactions, layout and console were checked in a real browser with Playwright during development (see `docs/AI_WORKFLOW.md`).
 
-The `dist/` folder is a static site, so it can be hosted anywhere. On Vercel, import the repository and keep the detected Vite settings (build command `npm run build`, output directory `dist`).
+The `dist/` folder is a static site, so it can be hosted anywhere. The live demo is deployed on Vercel with the Vercel CLI (`vercel deploy --prod`), using the detected Vite settings (build command `vite build`, output directory `dist`).
 
 ## Project structure
 
