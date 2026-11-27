@@ -1,0 +1,229 @@
+/*
+ * Grid: two rows of 16px-gapped tiles. Column widths follow Figma
+ * (648 + 936 and 936 + 648 inside 1600px) and every tile keeps the
+ * 518px design height through aspect-ratio, so artwork placed in
+ * percentages stays exactly where the designer put it.
+ */
+.tiles {
+  display: grid;
+  gap: 16px;
+}
+
+.tiles__row {
+  display: grid;
+  gap: 16px;
+}
+
+.tiles__row--1 {
+  grid-template-columns: 648fr 936fr;
+}
+
+.tiles__row--2 {
+  grid-template-columns: 936fr 648fr;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  isolation: isolate;
+}
+
+.tile--narrow {
+  aspect-ratio: 648 / 518;
+}
+
+.tile--wide {
+  aspect-ratio: 936 / 518;
+}
+
+.tile--light {
+  color: var(--color-white);
+}
+
+.tile--dark {
+  color: var(--color-black);
+}
+
+.tile--configurator {
+  background: var(--color-tile-blue);
+}
+
+.tile--catalog {
+  background: var(--color-tile-cream);
+}
+
+.tile--smart {
+  background: var(--color-tile-stone);
+}
+
+/* ---------- Artwork ---------- */
+.tile__media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* Zoom origin roughly in the middle of the visual weight. */
+  transform-origin: 60% 45%;
+  transition: transform var(--duration-zoom) var(--ease-out);
+}
+
+.tile:hover .tile__media,
+.tile:focus-within .tile__media {
+  transform: scale(1.1);
+}
+
+.tile__art {
+  position: absolute;
+  height: auto;
+}
+
+.tile__art--cover {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Positions = Figma x / tile width, y / tile height. */
+.tile__art--laptop {
+  left: 35.897%;
+  top: 0;
+  width: 64.103%;
+}
+
+.tile__art--ipad {
+  left: 45.299%;
+  top: 10.425%;
+  width: 52.137%;
+}
+
+.tile__art--phone-back {
+  left: 12.191%;
+  top: 13.9%;
+  width: 35.494%;
+}
+
+.tile__art--phone-front {
+  left: 33.951%;
+  top: 18.726%;
+  width: 64.66%;
+}
+
+/* ---------- Copy ---------- */
+.tile__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 48px;
+}
+
+.tile__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-weight: var(--fw-bold);
+  line-height: 1.1;
+}
+
+.tile__eyebrow {
+  font-size: var(--fs-21);
+}
+
+.tile__title {
+  font-size: var(--fs-32);
+  font-weight: inherit;
+}
+
+/* Stretched link: the whole tile is clickable, but there is only one link. */
+.tile__cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.tile:hover .tile__cta {
+  background: var(--color-grey-hover);
+}
+
+/* ---------- Small laptops: same grid, tighter copy ---------- */
+@media (max-width: 1279px) {
+  .tile__text {
+    gap: 20px;
+    padding: 32px;
+  }
+}
+
+/* ---------- Tablet: one tile per row, all in the wide format ---------- */
+@media (max-width: 1023px) {
+  .tiles__row--1,
+  .tiles__row--2 {
+    grid-template-columns: 1fr;
+  }
+
+  .tile--narrow {
+    aspect-ratio: 936 / 518;
+  }
+
+  /* The phones keep their size and move to the right half of the wider tile. */
+  .tile__art--phone-back {
+    left: 39.209%;
+    width: 24.573%;
+  }
+
+  .tile__art--phone-front {
+    left: 54.274%;
+    width: 44.765%;
+  }
+}
+
+/* ---------- Phones: taller tiles, artwork on top, copy underneath ---------- */
+@media (max-width: 767px) {
+  .tile--narrow,
+  .tile--wide {
+    aspect-ratio: auto;
+    min-height: 460px;
+  }
+
+  .tile__text {
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .tile__art--laptop {
+    left: 0;
+    top: -4%;
+    width: 112%;
+  }
+
+  .tile__art--ipad {
+    left: 14%;
+    top: 0;
+    width: 92%;
+  }
+
+  .tile__art--phone-back {
+    left: 4%;
+    top: 4%;
+    width: 46%;
+  }
+
+  .tile__art--phone-front {
+    left: 28%;
+    top: 6%;
+    width: 80%;
+  }
+
+  .tile--thoro .tile__text {
+    background: linear-gradient(to top, rgba(16, 16, 17, 0.45), transparent);
+  }
+}
+
+@media (hover: none) {
+  .tile:hover .tile__media {
+    transform: none;
+  }
+}

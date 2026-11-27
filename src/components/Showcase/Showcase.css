@@ -1,0 +1,20 @@
+.showcase {
+  padding-block: 86px;
+  background: var(--color-white);
+}
+
+.showcase__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+
+@media (max-width: 767px) {
+  .showcase {
+    padding-block: 40px 48px;
+  }
+
+  .showcase__inner {
+    gap: 32px;
+  }
+}
