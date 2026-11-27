@@ -41,13 +41,21 @@ This page was built in one conversation with **Claude Code** (Anthropic), runnin
 10. **Automated checks.** A Playwright script checks the following, with no console errors:
     - header transparent → white on hover and after scroll;
     - dropdown opens;
-    - autoplay advances after 3 s;
+    - autoplay advances after 7 s and pauses on hover, keyboard focus and lamp use;
     - arrows and bar segments work;
     - a lamp switches on when clicked;
     - parallax follows the pointer;
     - the tile image zooms to 1.1 and its button turns #4A4A4A;
     - on mobile: the menu opens, the submenu expands, Esc closes the menu, the search toggle focuses the input, and there is no horizontal overflow.
 11. **Docs.** Wrote the README and this log. Opened a pull request.
+12. **Calmer slideshow (user feedback).** The 3 s autoplay changed slides before the lamps could be tried out. I changed it as follows, without touching the layout (before/after full-page screenshots at 1920 and 390 px are pixel-identical):
+    - 7 s per slide and an 800 ms crossfade (new token `--duration-crossfade`);
+    - autoplay pauses while the pointer is over the hero or keyboard focus is inside it, and resumes 4 s after the last interaction (leaving, tapping, switching a lamp);
+    - focus from a mouse click does not hold the slider, so it still resumes after the pointer leaves;
+    - lamp clicks stop propagation and only toggle the light;
+    - every manual change restarts the progress bar, including clicking the current segment.
+
+    A new Playwright script checks the timing (bar at about half after 3.5 s, slide change at 7 s), the hover pause, the 4 s resume delay, the lamp toggles, the bar resets and the touch behaviour. All 17 checks pass with no console errors.
 
 ## Notes
 

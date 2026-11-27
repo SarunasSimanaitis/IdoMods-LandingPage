@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type FocusEvent, type PointerEvent } from 'react'
 import { LampScene } from './LampScene'
 import { useInView } from '../../hooks/useInView'
 import { usePageVisible } from '../../hooks/usePageVisible'
@@ -9,8 +9,11 @@ import arrowRight from '../../assets/icons/arrow-right.svg'
 import star from '../../assets/icons/star.svg'
 import './Hero.css'
 
-/** Autoplay delay from Figma comment 04. Also drives the progress bar fill. */
-const SLIDE_DURATION_MS = 3000
+/** Time each slide stays on screen. Also drives the progress bar fill. */
+const SLIDE_DURATION_MS = 7000
+
+/** How long autoplay waits after the last interaction before it continues. */
+const RESUME_DELAY_MS = 4000
 
 const slides = [
   { id: 'lamps', label: 'Lampy SOLLUX na tle zachodu słońca' },
@@ -18,24 +21,71 @@ const slides = [
 ]
 
 /**
- * Hero slider (Figma comment 04):
- * - autoplay every 3 s, 600 ms crossfade, image settles from scale 1.05 to 1;
- * - the yellow progress bar fills linearly over 3 s and the end of that CSS
+ * Hero slider (based on Figma comment 04, with calmer timing):
+ * - autoplay every 7 s, 800 ms crossfade, image settles from scale 1.05 to 1;
+ * - the yellow progress bar fills linearly over 7 s and the end of that CSS
  *   animation is what advances the slide, so bar and slide never drift apart;
- * - pauses when the tab is hidden, the hero is off-screen, or reduced motion is on.
+ * - autoplay pauses (the bar freezes) while the pointer is over the hero, while
+ *   something in it has keyboard focus, and for a few seconds after the last
+ *   interaction (leaving the hero, tapping it, switching a lamp);
+ * - it also pauses when the tab is hidden, the hero is off-screen, or reduced
+ *   motion is on;
+ * - any manual change (arrows, bar segments) restarts the bar from zero.
  */
 export function Hero() {
   const [activeIndex, setActiveIndex] = useState(0)
+  // Bumped on every slide change, so the progress bar restarts even when the
+  // same slide is picked again.
+  const [cycle, setCycle] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const [hasFocus, setHasFocus] = useState(false)
+  const [recentlyUsed, setRecentlyUsed] = useState(false)
+  const resumeTimer = useRef<number | undefined>(undefined)
+
   const heroRef = useRef<HTMLElement>(null)
   const inView = useInView(heroRef)
   const pageVisible = usePageVisible()
   const reducedMotion = usePrefersReducedMotion()
 
-  const isPlaying = inView && pageVisible && !reducedMotion
+  const isPlaying =
+    inView && pageVisible && !reducedMotion && !isHovered && !hasFocus && !recentlyUsed
 
   const goTo = useCallback((index: number) => {
     setActiveIndex((index + slides.length) % slides.length)
+    setCycle((count) => count + 1)
   }, [])
+
+  /** Holds autoplay until the user has left the hero alone for RESUME_DELAY_MS. */
+  const markInteraction = useCallback(() => {
+    setRecentlyUsed(true)
+    window.clearTimeout(resumeTimer.current)
+    resumeTimer.current = window.setTimeout(() => setRecentlyUsed(false), RESUME_DELAY_MS)
+  }, [])
+
+  useEffect(() => () => window.clearTimeout(resumeTimer.current), [])
+
+  // Touch has no hover, so taps count as interaction instead.
+  const onPointerEnter = (event: PointerEvent) => {
+    if (event.pointerType !== 'touch') setIsHovered(true)
+  }
+  const onPointerLeave = (event: PointerEvent) => {
+    if (event.pointerType === 'touch') return
+    setIsHovered(false)
+    markInteraction()
+  }
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType === 'touch') markInteraction()
+  }
+  // Only keyboard focus holds autoplay; a mouse click also focuses the button,
+  // and that focus would otherwise keep the slider paused after the pointer left.
+  const onFocus = (event: FocusEvent) => {
+    if (event.target.matches(':focus-visible')) setHasFocus(true)
+  }
+  const onBlur = (event: FocusEvent) => {
+    if (!hasFocus || event.currentTarget.contains(event.relatedTarget)) return
+    setHasFocus(false)
+    markInteraction()
+  }
 
   return (
     <section
@@ -44,6 +94,11 @@ export function Hero() {
       ref={heroRef}
       aria-roledescription="karuzela"
       aria-label="Bestsellery SOLLUX"
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onPointerDown={onPointerDown}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       <div className="hero__slides">
         {slides.map((slide, index) => (
@@ -58,7 +113,7 @@ export function Hero() {
           >
             <div className="hero__media">
               {slide.id === 'lamps' ? (
-                <LampScene isActive={index === activeIndex} />
+                <LampScene isActive={index === activeIndex} onInteract={markInteraction} />
               ) : (
                 <img className="hero__image" src={interior} alt="" />
               )}
@@ -110,8 +165,8 @@ export function Hero() {
           >
             {index === activeIndex && (
               <span
-                // A new key restarts the fill animation whenever the slide changes.
-                key={`fill-${activeIndex}`}
+                // A new key restarts the fill animation on every slide change.
+                key={`fill-${cycle}`}
                 className={`hero__progress-fill ${isPlaying ? '' : 'is-paused'} ${
                   reducedMotion ? 'is-static' : ''
                 }`}

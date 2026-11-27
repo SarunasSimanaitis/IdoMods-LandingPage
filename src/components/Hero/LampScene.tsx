@@ -52,9 +52,11 @@ const box = (x: number, y: number, width: number, height: number): CSSProperties
 type LampSceneProps = {
   /** Parallax only runs while the slide is visible. */
   isActive: boolean
+  /** Called on every lamp switch, so the slider can hold its autoplay. */
+  onInteract?: () => void
 }
 
-export function LampScene({ isActive }: LampSceneProps) {
+export function LampScene({ isActive, onInteract }: LampSceneProps) {
   const stageRef = useRef<HTMLDivElement>(null)
   const [litLamps, setLitLamps] = useState<Record<string, boolean>>({})
 
@@ -97,7 +99,10 @@ export function LampScene({ isActive }: LampSceneProps) {
     }
   }, [isActive])
 
-  const toggleLamp = (id: string) => setLitLamps((lit) => ({ ...lit, [id]: !lit[id] }))
+  const toggleLamp = (id: string) => {
+    setLitLamps((lit) => ({ ...lit, [id]: !lit[id] }))
+    onInteract?.()
+  }
   const litCount = Object.values(litLamps).filter(Boolean).length
 
   return (
@@ -137,7 +142,11 @@ export function LampScene({ isActive }: LampSceneProps) {
               aria-pressed={isOn}
               aria-label={`${isOn ? 'Wyłącz' : 'Włącz'} lampę ${lamp.label}`}
               title={isOn ? 'Kliknij, aby wyłączyć' : 'Kliknij, aby włączyć'}
-              onClick={() => toggleLamp(lamp.id)}
+              onClick={(event) => {
+                // A lamp click only switches its light; it never reaches the slider.
+                event.stopPropagation()
+                toggleLamp(lamp.id)
+              }}
             >
               <img src={lamp.src} alt="" draggable={false} />
               <span className="lamp__bulb" aria-hidden="true" />
