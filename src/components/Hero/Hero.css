@@ -1,0 +1,442 @@
+/* ---------- Hero frame ---------- */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Figma frame is 1920×1080; keep it a full screen but never taller than the design. */
+  height: clamp(560px, 100svh, 1080px);
+  overflow: hidden;
+  /* The lamp stage sizes itself from the hero's box (container query units). */
+  container-type: size;
+  background: #b3774c;
+  color: var(--color-white);
+}
+
+.hero__slides,
+.hero__slide,
+.hero__media {
+  position: absolute;
+  inset: 0;
+}
+
+/* Crossfade: 600 ms ease-in-out (Figma comment 04). */
+.hero__slide {
+  opacity: 0;
+  transition: opacity var(--duration-fade) var(--ease-in-out);
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+}
+
+/* Image settles from 1.05 to 1 while it fades in (800 ms ease-out). */
+.hero__media {
+  transform: scale(1.05);
+  transition: transform 0s linear var(--duration-fade);
+}
+
+.hero__slide.is-active .hero__media {
+  transform: scale(1);
+  transition: transform var(--duration-large) var(--ease-out);
+}
+
+.hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Copy ---------- */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+  padding-block: 64px;
+  /* Keep the copy clear of the 48px arrows (they sit 72px from the edge). */
+  --arrow-clearance: 136px;
+  padding-inline: max(
+    var(--gutter),
+    calc(var(--arrow-clearance) - max(0px, (100vw - var(--container-max) - 2 * var(--gutter)) / 2))
+  );
+  /* Let clicks reach the lamps behind the text; the button opts back in. */
+  pointer-events: none;
+}
+
+.hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero__eyebrow {
+  font-size: var(--fs-16);
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+}
+
+.hero__title {
+  font-size: var(--fs-56);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+.hero__cta {
+  pointer-events: auto;
+}
+
+/* ---------- Arrows ---------- */
+.hero__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  background: var(--color-overlay-soft);
+  transform: translateY(-50%);
+}
+
+.hero__arrow:hover {
+  background: var(--color-overlay);
+}
+
+.hero__arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.hero__arrow--prev {
+  left: 72px;
+}
+
+.hero__arrow--next {
+  right: 72px;
+}
+
+/* ---------- Progress bar ---------- */
+.hero__progress {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  transform: translateX(-50%);
+}
+
+/* 64×2 px bar from Figma, with a taller invisible hit area. */
+.hero__progress-step {
+  position: relative;
+  width: 64px;
+  height: 22px;
+}
+
+.hero__progress-step::before,
+.hero__progress-fill {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 2px;
+}
+
+.hero__progress-step::before {
+  background: var(--color-progress-track);
+}
+
+.hero__progress-fill {
+  background: var(--color-yellow);
+  transform-origin: left center;
+  animation-name: hero-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.hero__progress-fill.is-paused {
+  animation-play-state: paused;
+}
+
+.hero__progress-fill.is-static {
+  animation: none !important;
+}
+
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Rating badge ---------- */
+.hero__rating {
+  position: absolute;
+  right: 72px;
+  bottom: 32px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  background: var(--color-overlay);
+  transition: background-color var(--duration-hover) var(--ease-in-out);
+}
+
+.hero__rating:hover {
+  background: rgba(16, 16, 17, 0.6);
+}
+
+.hero__rating-score {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-21);
+  font-weight: var(--fw-bold);
+  line-height: 1.1;
+}
+
+.hero__rating-text {
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+  line-height: 1.1;
+}
+
+/* ---------- Lamp scene (slide 1) ---------- */
+
+/*
+ * A 16:9 stage that always covers the hero (like object-fit: cover).
+ * 100cqw / 100cqh are the hero's width / height.
+ */
+.lamp-scene {
+  --px: 0;
+  --py: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100cqw, 100cqh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+}
+
+.lamp-scene__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lamp-scene__ambient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 70% at 52% 55%, rgba(255, 196, 120, 0.35), transparent 70%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  transition: opacity var(--duration-large) var(--ease-out);
+}
+
+.lamp-scene__layer {
+  position: absolute;
+  /* Parallax: each layer moves by its own depth (px on the 1920 stage). */
+  transform: translate3d(
+    calc(var(--px) * var(--depth) * 1px),
+    calc(var(--py) * var(--depth) * 0.6px),
+    0
+  );
+  will-change: transform;
+}
+
+.lamp-scene__layer > img,
+.lamp__button img {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+/* Gentle idle float, on an inner element so it combines with the parallax. */
+.lamp__button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 40%;
+  animation: lamp-float 7s var(--ease-in-out) var(--float-delay) infinite alternate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lamp__button:focus-visible {
+  outline-offset: -12px;
+}
+
+.lamp__button img {
+  transition: transform var(--duration-zoom) var(--ease-out);
+}
+
+.lamp__button:hover img {
+  transform: scale(1.03) rotate(-1deg);
+}
+
+.lamp__button:active img {
+  transform: scale(0.98);
+}
+
+@keyframes lamp-float {
+  from {
+    transform: translateY(-1.2%) rotate(-1.2deg);
+  }
+
+  to {
+    transform: translateY(1.2%) rotate(1.2deg);
+  }
+}
+
+/* Light: a bright disc on the diffuser + a large warm halo, both opacity-only. */
+.lamp__bulb,
+.lamp__glow {
+  position: absolute;
+  left: var(--face-x);
+  top: var(--face-y);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+  transition: opacity var(--duration-zoom) var(--ease-out),
+    transform var(--duration-large) var(--ease-out);
+}
+
+.lamp__bulb {
+  width: 46%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, #fffaf0 0%, #ffe7b8 38%, rgba(255, 214, 150, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+.lamp__glow {
+  width: 260%;
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 170, 0.75) 0%,
+    rgba(255, 196, 110, 0.35) 22%,
+    rgba(255, 170, 90, 0) 60%
+  );
+  mix-blend-mode: screen;
+}
+
+.lamp.is-on .lamp__bulb,
+.lamp.is-on .lamp__glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.lamp.is-on .lamp__glow {
+  animation: lamp-flicker 4s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes lamp-flicker {
+  from {
+    opacity: 0.9;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1279px) {
+  .hero__arrow--prev {
+    left: 24px;
+  }
+
+  .hero__arrow--next {
+    right: 24px;
+  }
+
+  .hero__rating {
+    right: 24px;
+  }
+
+  .hero__content {
+    --arrow-clearance: 88px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    align-items: flex-end;
+    height: max(560px, 100svh);
+  }
+
+  /*
+   * Phones: instead of cropping the 16:9 scene to a narrow slice (which would
+   * show one lamp), shrink it so all three lamps fit, pin it to the top and let
+   * the copy sit underneath on the dark colour of the rock.
+   */
+  .hero {
+    /* Top: sky colour of the backdrop behind the header; rest: rock colour. */
+    background: linear-gradient(to bottom, #986442 0 30%, #2e1c12 30%);
+  }
+
+  .lamp-scene {
+    top: calc(var(--header-height) - 16px);
+    width: 180cqw;
+    transform: translateX(-50%);
+  }
+
+  .lamp-scene::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px;
+    height: 20%;
+    background: linear-gradient(to bottom, rgba(46, 28, 18, 0), #2e1c12);
+    pointer-events: none;
+  }
+
+  .hero__content {
+    padding-inline: var(--gutter);
+    padding-block: 0 112px;
+    gap: 24px;
+  }
+
+  .hero__arrow {
+    top: auto;
+    bottom: 24px;
+    background: rgba(255, 255, 255, 0.12);
+    transform: none;
+  }
+
+  .hero__arrow:active {
+    transform: scale(0.94);
+  }
+
+  .hero__arrow--prev {
+    left: var(--gutter);
+  }
+
+  .hero__arrow--next {
+    right: auto;
+    left: calc(var(--gutter) + 56px);
+  }
+
+  .hero__progress {
+    bottom: 37px;
+    left: auto;
+    right: var(--gutter);
+    transform: none;
+  }
+
+  .hero__progress-step {
+    width: 40px;
+  }
+
+  /* Sits just under the lamp scene (its height is 180cqw × 9/16 ≈ 101cqw). */
+  .hero__rating {
+    top: calc(var(--header-height) - 16px + 101cqw);
+    right: var(--gutter);
+    bottom: auto;
+    padding: 8px 16px;
+  }
+}

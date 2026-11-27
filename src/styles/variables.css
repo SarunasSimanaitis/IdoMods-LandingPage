@@ -1,0 +1,49 @@
+/*
+ * Design tokens taken from the Figma file.
+ * Every colour, font size and timing used by the components comes from here,
+ * so the whole page can be re-themed in one place.
+ */
+:root {
+  /* Colours */
+  --color-black: #101011;
+  --color-ink: #1e1e1e;
+  --color-white: #ffffff;
+  --color-yellow: #f2bf25;
+  --color-grey-hover: #4a4a4a; /* tile button hover (Figma comment 05) */
+  --color-border: #e7e7e7;
+  --color-tile-blue: #72a3f3;
+  --color-tile-cream: #fdf8eb;
+  --color-tile-stone: #e8e4df;
+  --color-overlay-soft: rgba(16, 16, 17, 0.2); /* hero arrows */
+  --color-overlay: rgba(16, 16, 17, 0.4); /* rating badge */
+  --color-progress-track: rgba(231, 231, 231, 0.5);
+
+  /* Typography (Red Hat Display, weights 500 and 700) */
+  --font-family: 'Red Hat Display Variable', 'Red Hat Display', system-ui, sans-serif;
+  --fw-medium: 500;
+  --fw-bold: 700;
+  --fs-12: 0.75rem;
+  --fs-13: 0.8125rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-21: 1.3125rem;
+  --fs-32: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
+  --fs-56: clamp(2.25rem, 1.4rem + 2.6vw, 3.5rem);
+
+  /* Layout */
+  --container-max: 1600px;
+  --gutter: clamp(16px, 3vw, 48px);
+  --radius-tile: 24px;
+  --radius-pill: 100px;
+
+  /* Motion (Figma comment 01: one easing everywhere, ease-out for zooms) */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-hover: 250ms;
+  --duration-button: 200ms;
+  --duration-fade: 600ms;
+  --duration-zoom: 500ms;
+  --duration-large: 800ms;
+
+  --header-height: 80px;
+}
